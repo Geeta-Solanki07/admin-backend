@@ -14,26 +14,25 @@ const generateToken = (admin) =>
 export const adminLogin = async (req, res) => {
   try {
     const { email, password } = req.body || {};
-
-    if (!email || !password) {
+    if (!email || !password)
       return res.status(400).json({ message: "Email and password required" });
-    }
 
     const admin = await Admin.findOne({ email }).select("+password");
-    if (!admin) {
+    if (!admin)
       return res.status(401).json({ message: "Invalid credentials" });
-    }
 
     const isMatch = await bcrypt.compare(password, admin.password);
-    if (!isMatch) {
+    if (!isMatch)
       return res.status(401).json({ message: "Invalid credentials" });
-    }
 
     res.status(200).json({
       admin_id: admin._id,
-      name: `${admin.firstName} ${admin.lastName}`,
+      firstName: admin.firstName,
+      lastName: admin.lastName,
       email: admin.email,
+      phone: admin.phone,
       role: admin.role,
+      profilePic: admin.profilePic,
       token: generateToken(admin),
     });
   } catch (error) {
@@ -42,21 +41,20 @@ export const adminLogin = async (req, res) => {
   }
 };
 
-//  CREATE ADMIN 
+// CREATE ADMIN
 export const createAdmin = async (req, res) => {
   try {
-    const { firstName, lastName, email, password, role } = req.body || {};
+    const { firstName, lastName, email, password, role, phone, profilePic } =
+      req.body || {};
 
-    if (!firstName || !lastName || !email || !password) {
-      return res.status(400).json({
-        message: "All required fields must be filled",
-      });
-    }
+    if (!firstName || !lastName || !email || !password)
+      return res
+        .status(400)
+        .json({ message: "All required fields must be filled" });
 
     const exists = await Admin.findOne({ email });
-    if (exists) {
+    if (exists)
       return res.status(400).json({ message: "Admin already exists" });
-    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -66,14 +64,20 @@ export const createAdmin = async (req, res) => {
       email,
       password: hashedPassword,
       role: role || "SUB_ADMIN",
+      phone: phone || "",
+      profilePic: profilePic || "",
     });
 
     res.status(201).json({
       message: "Admin created successfully",
       admin: {
-        admin_id: admin._id, // renamed from id
+        admin_id: admin._id,
+        firstName: admin.firstName,
+        lastName: admin.lastName,
         email: admin.email,
+        phone: admin.phone,
         role: admin.role,
+        profilePic: admin.profilePic,
       },
     });
   } catch (error) {
@@ -82,11 +86,21 @@ export const createAdmin = async (req, res) => {
   }
 };
 
-// GET ALL ADMINS 
+// GET ALL ADMINS
 export const getAdmins = async (req, res) => {
   try {
     const admins = await Admin.find().select("-password");
-    res.status(200).json(admins);
+    res.status(200).json(
+      admins.map((admin) => ({
+        admin_id: admin._id,
+        firstName: admin.firstName,
+        lastName: admin.lastName,
+        email: admin.email,
+        phone: admin.phone,
+        role: admin.role,
+        profilePic: admin.profilePic,
+      }))
+    );
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
@@ -97,15 +111,17 @@ export const getAdmins = async (req, res) => {
 export const getAdminById = async (req, res) => {
   try {
     const admin = await Admin.findById(req.params.id).select("-password");
-    if (!admin) {
+    if (!admin)
       return res.status(404).json({ message: "Admin not found" });
-    }
+
     res.status(200).json({
       admin_id: admin._id,
       firstName: admin.firstName,
       lastName: admin.lastName,
       email: admin.email,
+      phone: admin.phone,
       role: admin.role,
+      profilePic: admin.profilePic,
     });
   } catch (error) {
     console.error(error);
@@ -113,18 +129,15 @@ export const getAdminById = async (req, res) => {
   }
 };
 
-// UPDATE ADMIN 
+// UPDATE ADMIN
 export const updateAdmin = async (req, res) => {
   try {
     const admin = await Admin.findById(req.params.id);
-    if (!admin) {
+    if (!admin)
       return res.status(404).json({ message: "Admin not found" });
-    }
 
-    // Hash password if updated
-    if (req.body.password) {
+    if (req.body.password)
       req.body.password = await bcrypt.hash(req.body.password, 10);
-    }
 
     Object.assign(admin, req.body);
     await admin.save();
@@ -136,7 +149,9 @@ export const updateAdmin = async (req, res) => {
         firstName: admin.firstName,
         lastName: admin.lastName,
         email: admin.email,
+        phone: admin.phone,
         role: admin.role,
+        profilePic: admin.profilePic,
       },
     });
   } catch (error) {
@@ -145,13 +160,12 @@ export const updateAdmin = async (req, res) => {
   }
 };
 
-// DELETE ADMIN 
+// DELETE ADMIN
 export const deleteAdmin = async (req, res) => {
   try {
     const admin = await Admin.findById(req.params.id);
-    if (!admin) {
+    if (!admin)
       return res.status(404).json({ message: "Admin not found" });
-    }
 
     await admin.remove();
     res.status(200).json({ message: "Admin deleted successfully" });
