@@ -1,23 +1,23 @@
 import express from "express";
-import protect from "../middleware/adminMiddleware.js";
-import isSuperAdmin from "../middleware/roleMiddleware.js";
 import {
   adminLogin,
   createAdmin,
-  getAdmins,
-  getAdminById,
+  listAdmins,
+  getAdminDetails,
   updateAdmin,
-  deleteAdmin
+  deleteAdmin,
 } from "../controllers/adminController.js";
+
+import protect from "../middleware/adminMiddleware.js";
+import isSuperAdmin from "../middleware/roleMiddleware.js";
 
 const router = express.Router();
 
 router.post("/login", adminLogin);
-
-router.post("/", protect, isSuperAdmin, createAdmin);
-router.get("/", protect, getAdmins);
-router.get("/:id", protect, getAdminById);
-router.put("/:id", protect, updateAdmin);
-router.delete("/:id", protect, isSuperAdmin, deleteAdmin);
+router.post("/create", protect, isSuperAdmin, createAdmin);
+router.post("/list", protect, listAdmins);
+router.get("/details/:id", protect, getAdminDetails);
+router.put("/update/:id", protect, updateAdmin);
+router.delete("/delete/:id", protect, isSuperAdmin, deleteAdmin);
 
 export default router;

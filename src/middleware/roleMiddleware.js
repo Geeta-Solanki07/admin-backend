@@ -6,3 +6,5 @@ const isSuperAdmin = (req, res, next) => {
 };
 
 export default isSuperAdmin;
+
+
