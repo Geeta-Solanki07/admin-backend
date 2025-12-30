@@ -1,28 +1,33 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import Admin from "../models/Admin.js";
+import bcrypt from "bcryptjs";
+import Admin from "../models/admin.Schema.js";
 
 dotenv.config();
 
 const seedAdmin = async () => {
   try {
+    // 1️⃣ Connect to MongoDB
     await mongoose.connect(process.env.MONGO_URI);
+    console.log("✅ MongoDB connected");
 
-    const adminCount = await Admin.countDocuments();
+    // 2️⃣ Delete all existing admins
+    await Admin.deleteMany({});
+    console.log("🗑️ Existing admins deleted");
 
-    if (adminCount === 0) {
-      await Admin.create({
-        firstName: "Geeta",
-        lastName: "Solanki",
-        email: "geeta@dousoft.com",
-        password: "geeta@123",
-        role: "SUPER_ADMIN"
-      });
+    // 3️⃣ Create fresh Super Admin
+    const hashedPassword = await bcrypt.hash("raj@123", 10); // hash password
+    await Admin.create({
+      firstName: "Raj",
+      lastName: "Rajput",
+      email: "raj@dousoft.com",
+      password: hashedPassword,
+      role: "SUPER_ADMIN",
+      phone: "",
+      profilePic: "",
+    });
 
-      console.log("✅ Super Admin created successfully");
-    } else {
-      console.log("ℹ️ Admin already exists");
-    }
+    console.log("✅ Super Admin created successfully");
 
     process.exit();
   } catch (error) {
