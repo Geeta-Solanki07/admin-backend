@@ -31,23 +31,23 @@ import {
   updateAdmin,
   deleteAdmin,
 } from "../controllers/adminController.js";
-
 import { protect, isSuperAdmin } from "../middleware/adminMiddleware.js";
+import multer from "multer";
 
 const router = express.Router();
 
-// AUTH
+// Multer setup for file upload
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+// ✅ AUTH
 router.post("/login", adminLogin);
 
-// ADMIN MANAGEMENT
-router.post("/create", protect, isSuperAdmin, createAdmin);
-
-router.get("/list", protect, isSuperAdmin, listAdmins);
-
+// ✅ ADMIN MANAGEMENT
+router.post("/create", protect, isSuperAdmin, upload.single("profilePic"), createAdmin);
+router.post("/list", protect, isSuperAdmin, listAdmins); // POST method for listing admins
 router.get("/details/:id", protect, getAdminDetails);
-
-router.put("/update/:id", protect, updateAdmin);
-
+router.put("/update/:id", protect, upload.single("profilePic"), updateAdmin);
 router.delete("/delete/:id", protect, isSuperAdmin, deleteAdmin);
 
 export default router;
