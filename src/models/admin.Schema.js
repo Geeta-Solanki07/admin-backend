@@ -5,31 +5,12 @@ const adminSchema = new mongoose.Schema(
   {
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
-
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-      lowercase: true,
-      trim: true
-    },
-
-    phone: String,
-
-    password: {
-      type: String,
-      required: true,
-      minlength: 6,
-      select: false
-    },
-
-    role: {
-      type: String,
-      enum: ["SUPER_ADMIN", "SUB_ADMIN"],
-      default: "SUPER_ADMIN"
-    },
-
-    profilePic: String
+    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+    phone: { type: String, default: "" },
+    password: { type: String, required: true, minlength: 8, select: false },
+    role: { type: String, enum: ["SUPER_ADMIN", "SUB_ADMIN"], default: "SUB_ADMIN" },
+    profilePic: { type: String, default: "" },
+    token: { type: String, default: "" },
   },
   { timestamps: true }
 );
