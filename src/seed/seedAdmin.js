@@ -1,37 +1,64 @@
+// import mongoose from "mongoose";
+// import dotenv from "dotenv";
+// import Admin from "../models/admin.Schema.js";
+
+// dotenv.config();
+
+// const seedAdmin = async () => {
+//   try {
+//     await mongoose.connect(process.env.MONGO_URI);
+
+//     const adminCount = await Admin.countDocuments();
+
+//     if (adminCount === 0) {
+//       await Admin.create({
+//         firstName: "Raj",
+//         lastName: "Rajput",
+//         email: "raj@dousoft.com",
+//         password: "raj@123",
+//         role: "SUPER_ADMIN"
+//       });
+
+//       console.log("✅ Super Admin created successfully");
+//     } else {
+//       console.log("ℹ️ Admin already exists");
+//     }
+
+//     process.exit();
+//   } catch (error) {
+//     console.error("❌ Seed error:", error);
+//     process.exit(1);
+//   }
+// };
+
+// seedAdmin();
+
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import bcrypt from "bcryptjs";
 import Admin from "../models/admin.Schema.js";
 
 dotenv.config();
 
 const seedAdmin = async () => {
   try {
-    // 1️⃣ Connect to MongoDB
     await mongoose.connect(process.env.MONGO_URI);
     console.log("✅ MongoDB connected");
 
-    // 2️⃣ Delete all existing admins
     await Admin.deleteMany({});
     console.log("🗑️ Existing admins deleted");
 
-    // 3️⃣ Create fresh Super Admin
-    const hashedPassword = await bcrypt.hash("raj@123", 10); // hash password
     await Admin.create({
-      firstName: "Raj",
+      firstName: "Riya",
       lastName: "Rajput",
-      email: "raj@dousoft.com",
-      password: hashedPassword,
+      email: "riya@dousoft.com",
+      password: "riya@123",
       role: "SUPER_ADMIN",
-      phone: "",
-      profilePic: "",
     });
 
-    console.log("✅ Super Admin created successfully");
-
+    console.log("✅ Super Admin created");
     process.exit();
   } catch (error) {
-    console.error("❌ Seed error:", error);
+    console.error("Seed error:", error);
     process.exit(1);
   }
 };
